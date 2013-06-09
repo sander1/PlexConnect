@@ -178,7 +178,12 @@ def XML_PMS2aTV(address, path, options):
     if 'PlexConnect' in options:
         cmd = options['PlexConnect']
         del options['PlexConnect']
-    
+
+    # Remove PlexUDID from options - sander1
+    if 'PlexUDID' in options:
+        plexudid = options['PlexUDID']
+        del options['PlexUDID']
+
     if len(options)==0:
         PMS = XML_ReadFromURL(address, path)
     else:
