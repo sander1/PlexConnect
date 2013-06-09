@@ -23,6 +23,8 @@ import ATVSettings
 from Debug import *  # dprint()
 import XMLConverter  # XML_PMS2aTV, XML_PlayVideo
 
+import urlparse
+from urllib import unquote_plus
 
 
 g_param = {}
@@ -44,28 +46,21 @@ class MyHandler(BaseHTTPRequestHandler):
         try:
             dprint(__name__, 2, "http request header:\n{0}", self.headers)
             dprint(__name__, 2, "http request path:\n{0}", self.path)
-            
+
             # break up path, separate options
-            # compare urlparse.parse_qs() but that returns {option:[lists of val]}
-            options = {}
-            if self.path.find('?')==-1 and \
-               self.path.find('&')==-1:
-                pass
+            if '?' in self.path:
+              (self.path, options) = self.path.split('?')
+            elif '&' in self.path:
+              (self.path, options) = self.path.split('&', 1)
+
+            if len(options) > 0:
+              options = dict(urlparse.parse_qsl(options))
+
+              for key in options:
+                options[key] = unquote_plus(options[key])
             else:
-                if not self.path.find('?')==-1:
-                    parts = self.path.split('?',1)
-                else:
-                    parts = self.path.split('&',1)
-                self.path = parts[0]
-                
-                parts = parts[1].split('&')
-                for opt in parts:
-                    opt_parts = opt.split('=',1)
-                    if len(opt_parts)==1:
-                        options[opt_parts[0]] = ''
-                    else:
-                        options[opt_parts[0]] = opt_parts[1]
-            
+              options = {}
+
             dprint(__name__, 2, "cleaned path:\n{0}", self.path)
             dprint(__name__, 2, "request args:\n{0}", options)
             
