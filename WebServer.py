@@ -52,6 +52,8 @@ class MyHandler(BaseHTTPRequestHandler):
               (self.path, options) = self.path.split('?')
             elif '&' in self.path:
               (self.path, options) = self.path.split('&', 1)
+            else:
+              options = ''
 
             if len(options) > 0:
               options = dict(urlparse.parse_qsl(options))
